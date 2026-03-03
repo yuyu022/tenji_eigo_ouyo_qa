@@ -81,18 +81,25 @@
 ========================================================= */
 
 /** バージョン情報 */
-const APP_VERSION = "v1.0.2（作成：2026/3/3 23:00）";
+const APP_VERSION = "v1.0.3（作成：2026/3/3 23:30）";
 
 
 
   
 /** 音声設定（後で音声速度を変えやすいように） */
 const SPEECH = {
-  // iPad Safari / Chrome ともに Web Speech API を使用
-  lang: "ja-JP",     // 日本語音声で読み上げ
-  rate: 1.0,         // ★速度：0.1～10（実用は 0.8～1.2 くらい）
-  pitch: 1.0,        // 高さ
-  volume: 1.0        // 音量
+  ja: {
+    lang: "ja-JP",     // 日本語音声で読み上
+    rate: 1.0,         // ★速度：0.1～10（実用は 0.8～1.2 くらい）
+    pitch: 1.0,        // 高さ
+    volume: 1.0        // 音量
+  },
+  en: {
+    lang: "en-US",   // 必要なら en-GB などに変更OK
+    rate: 0.7,       // ★速度：0.1～10（実用は 0.8～1.2 くらい）
+    pitch: 1.0,      // 高さ
+    volume: 1.0      // 音量
+  }
 };
 
 /** 出題の待機時間（ミリ秒） */
@@ -102,10 +109,12 @@ const DELAY = {
 };
 
 /**
+
+ *** 以下使わなくなったので、コメントアウトに変更済 ********。
+ 
  * 英語を「日本語で発音」するための読み上げ方針
  * - できるだけ「ja（かな）」を用意しておくと自然に読めます（後で編集しやすい）
  * - ja が無い場合は「アルファベットを日本語読み（エー、ビー…）」で読みます
- */
 const PRONOUNCE = {
   // 1文字ごとの読み（必要なら調整してください）
   letterMap: {
@@ -114,6 +123,7 @@ const PRONOUNCE = {
     s:"エス", t:"ティー", u:"ユー", v:"ブイ", w:"ダブリュー", x:"エックス", y:"ワイ", z:"ゼット"
   }
 };
+ */
 
 /* =========================================================
   問題データ（各ボタンに紐づく）
@@ -127,6 +137,19 @@ const QUIZ_SETS = [
     id: "btn1",
     name: "１．きょうしゅくやく語",
     items: [
+      { word:"and",   dots:[[1,2,3,4,6]] },
+      { word:"for",   dots:[[1,2,3,4,5,6]] },
+      { word:"of",    dots:[[1,2,3,5,6]] },
+      { word:"the",   dots:[[2,3,4,6]] },
+      { word:"with",  dots:[[2,3,4,5,6]] },
+      { word:"child", dots:[[1,6]] },
+      { word:"shall", dots:[[1,4,6]] },
+      { word:"this",  dots:[[1,4,5,6]] },
+      { word:"which", dots:[[1,5,6]] },
+      { word:"out",   dots:[[1,2,5,6]] },
+      { word:"still", dots:[[3,4]] }
+
+    /* =========================================================
       { word:"and",   ja:"アンド", dots:[[1,2,3,4,6]] },
       { word:"for",   ja:"フォー", dots:[[1,2,3,4,5,6]] },
       { word:"of",    ja:"オブ",   dots:[[1,2,3,5,6]] },
@@ -138,12 +161,37 @@ const QUIZ_SETS = [
       { word:"which", ja:"ウィッチ", dots:[[1,5,6]] },
       { word:"out",   ja:"アウト", dots:[[1,2,5,6]] },
       { word:"still", ja:"スティル", dots:[[3,4]] }
+    ========================================================= */
     ]
   },
   {
     id: "btn2",
     name: "２．とうじしゅくやくの①。 5の点のと組み合わせるもの",
     items: [
+      { word:"day",        dots:[[5],[1,3,4]] },
+      { word:"ever",       dots:[[5],[1,5]] },
+      { word:"father",     dots:[[5],[1,2,4]] },
+      { word:"here",       dots:[[5],[1,2,5]] },
+      { word:"know",       dots:[[5],[1,3]] },
+      { word:"lord",       dots:[[5],[1,2,3]] },
+      { word:"mother",     dots:[[5],[1,3,4]] },
+      { word:"name",       dots:[[5],[1,3,4,5]] },
+      { word:"one",        dots:[[5],[1,3,5]] },
+      { word:"part",       dots:[[5],[1,2,3,4]] },
+      { word:"question",   dots:[[5],[1,2,3,4,5]] },
+      { word:"right",      dots:[[5],[1,2,3,5]] },
+      { word:"some",       dots:[[5],[2,3,4]] },
+      { word:"time",       dots:[[5],[2,3,4,5]] },
+      { word:"under",      dots:[[5],[1,3,6]] },
+      { word:"work",       dots:[[5],[2,4,5,6]] },
+      { word:"young",      dots:[[5],[1,3,4,5,6]] },
+      { word:"there",      dots:[[5],[2,3,4,6]] },
+      { word:"character",  dots:[[5],[1,6]] },
+      { word:"through",    dots:[[5],[1,4,5,6]] },
+      { word:"where",      dots:[[5],[1,5,6]] },
+      { word:"ought",      dots:[[5],[1,2,5,6]] }
+
+    /* =========================================================
       { word:"day",       ja:"デイ",       dots:[[5],[1,3,4]] },
       { word:"ever",      ja:"エヴァー",    dots:[[5],[1,5]] },
       { word:"father",    ja:"ファーザー",  dots:[[5],[1,2,4]] },
@@ -166,6 +214,7 @@ const QUIZ_SETS = [
       { word:"through",   ja:"スルー",      dots:[[5],[1,4,5,6]] },
       { word:"where",     ja:"ウェア",      dots:[[5],[1,5,6]] },
       { word:"ought",     ja:"オート",      dots:[[5],[1,2,5,6]] }
+    ========================================================= */
     ]
   },
   {
@@ -191,12 +240,20 @@ const QUIZ_SETS = [
     id: "btn4",
     name: "４．とうじしゅくやくの③。 4と5と6の点と組み合わせるもの",
     items: [
+      { word:"cannot", dots:[[4,5,6],[1,4]] },
+      { word:"had",    dots:[[4,5,6],[1,2,5]] },
+      { word:"many",   dots:[[4,5,6],[1,3,4]] },
+      { word:"spirit", dots:[[4,5,6],[2,3,4]] },
+      { word:"world",  dots:[[4,5,6],[2,4,5,6]] },
+      { word:"their",  dots:[[4,5,6],[2,3,4,6]] }
+    /* =========================================================
       { word:"cannot", ja:"キャンノット", dots:[[4,5,6],[1,4]] },
       { word:"had",    ja:"ハド",       dots:[[4,5,6],[1,2,5]] },
       { word:"many",   ja:"メニー",     dots:[[4,5,6],[1,3,4]] },
       { word:"spirit", ja:"スピリット", dots:[[4,5,6],[2,3,4]] },
       { word:"world",  ja:"ワールド",   dots:[[4,5,6],[2,4,5,6]] },
       { word:"their",  ja:"ゼア",       dots:[[4,5,6],[2,3,4,6]] }
+    ========================================================= */
     ]
   },
   {
@@ -238,12 +295,21 @@ const QUIZ_SETS = [
     id: "btn7",
     name: "７．下がりしゅくやくご",
     items: [
+      { word:"be",     dots:[[2,3]] },
+      { word:"were",   dots:[[2,3,5,6]] },
+      { word:"his",    dots:[[2,3,6]] },
+      { word:"was",    dots:[[3,5,6]] },
+      { word:"enough", dots:[[2,6]] },
+      { word:"in",     dots:[[3,5]] }
+
+    /* =========================================================
       { word:"be",     ja:"ビー",      dots:[[2,3]] },
       { word:"were",   ja:"ワー",      dots:[[2,3,5,6]] },
       { word:"his",    ja:"ヒズ",      dots:[[2,3,6]] },
       { word:"was",    ja:"ワズ",      dots:[[3,5,6]] },
       { word:"enough", ja:"イナフ",    dots:[[2,6]] },
       { word:"in",     ja:"イン",      dots:[[3,5]] }
+    ========================================================= */
     ]
   },
   {
@@ -274,6 +340,23 @@ const QUIZ_SETS = [
     id: "btn10",
     name: "１０．たんけいごの①。 最初の二マスを残して後ろを省略するもの",
     items: [
+      { word:"about",     dots:[[1],[1,2]] },
+      { word:"according", dots:[[1],[1,4]] },
+      { word:"after",     dots:[[1],[1,2,4]] },
+      { word:"again",     dots:[[1],[1,2,4,5]] },
+      { word:"also",      dots:[[1],[1,2,3]] },
+      { word:"because",   dots:[[2,3],[1,4]] },
+      { word:"before",    dots:[[2,3],[1,2,4]] },
+      { word:"behind",    dots:[[2,3],[1,2,5]] },
+      { word:"below",     dots:[[2,3],[1,2,3]] },
+      { word:"beneath",   dots:[[2,3],[1,3,4,5]] },
+      { word:"beside",    dots:[[2,3],[2,3,4]] },
+      { word:"between",   dots:[[2,3],[2,3,4,5]] },
+      { word:"beyond",    dots:[[2,3],[1,3,4,5,6]] },
+      { word:"blind",     dots:[[1,2],[1,2,3]] },
+      { word:"either",    dots:[[1,5],[2,4]] },
+      { word:"friend",    dots:[[1,2,4],[1,2,3,5]] }
+    /* =========================================================
       { word:"about",     ja:"アバウト",     dots:[[1],[1,2]] },
       { word:"according", ja:"アコーディング",dots:[[1],[1,4]] },
       { word:"after",     ja:"アフター",     dots:[[1],[1,2,4]] },
@@ -290,12 +373,42 @@ const QUIZ_SETS = [
       { word:"blind",     ja:"ブラインド",   dots:[[1,2],[1,2,3]] },
       { word:"either",    ja:"イーザー",     dots:[[1,5],[2,4]] },
       { word:"friend",    ja:"フレンド",     dots:[[1,2,4],[1,2,3,5]] }
+    ========================================================= */
     ]
   },
   {
     id: "btn11",
     name: "１１．たんけいごの①。 骨組みだけを残して母音などを省略するもの",
     items: [
+      { word:"children",  dots:[[1,4],[1,3,4,5]] },
+      { word:"could",     dots:[[1,4],[1,4,5]] },
+      { word:"first",     dots:[[1,2,4],[3,4]] },
+      { word:"good",      dots:[[1,2,4,5],[1,4,5]] },
+      { word:"him",       dots:[[1,2,5],[1,3,4]] },
+      { word:"its",       dots:[[1,3,4,6],[2,3,4]] },
+      { word:"letter",    dots:[[1,2,3],[1,2,3,5]] },
+      { word:"little",    dots:[[1,2,3],[1,2,3]] },
+      { word:"much",      dots:[[1,3,4],[1,6]] },
+      { word:"must",      dots:[[1,3,4],[3,4]] },
+      { word:"paid",      dots:[[1,2,3,4],[1,4,5]] },
+      { word:"quick",     dots:[[1,2,3,4,5],[1,3]] },
+      { word:"said",      dots:[[2,3,4],[1,4,5]] },
+      { word:"should",    dots:[[1,4,6],[1,4,5]] },
+      { word:"such",      dots:[[2,3,4],[1,6]] },
+      { word:"today",     dots:[[2,3,4,5],[1,4,5]] },
+      { word:"tomorrow",  dots:[[2,3,4,5],[1,3,4]] },
+      { word:"tonight",   dots:[[2,3,4,5],[1,3,4,5]] },
+      { word:"would",     dots:[[2,4,5,6],[1,4,5]] },
+      { word:"your",      dots:[[1,3,4,5,6],[1,2,3,5]] },
+      { word:"above",     dots:[[1],[1,2],[1,2,3,6]] },
+      { word:"afternoon", dots:[[1],[1,2,4],[1,3,4,5]] },
+      { word:"afterward", dots:[[1],[1,2,4],[2,4,5,6]] },
+      { word:"against",   dots:[[1],[1,2,4,5],[3,4]] },
+      { word:"braille",   dots:[[1,2],[1,2,3,5],[1,2,3]] },
+      { word:"great",     dots:[[1,2,4,5],[1,2,3,5],[2,3,4,5]] },
+      { word:"together",  dots:[[2,3,4,5],[1,2,4,5],[1,2,3,5]] }
+
+    /* =========================================================
       { word:"children",  ja:"チルドレン",  dots:[[1,4],[1,3,4,5]] },
       { word:"could",     ja:"クッド",      dots:[[1,4],[1,4,5]] },
       { word:"first",     ja:"ファースト",  dots:[[1,2,4],[3,4]] },
@@ -323,12 +436,25 @@ const QUIZ_SETS = [
       { word:"braille",   ja:"ブレイル",    dots:[[1,2],[1,2,3,5],[1,2,3]] },
       { word:"great",     ja:"グレイト",    dots:[[1,2,4,5],[1,2,3,5],[2,3,4,5]] },
       { word:"together",  ja:"トゥゲザー",  dots:[[2,3,4,5],[1,2,4,5],[1,2,3,5]] }
+    ========================================================= */
     ]
   },
   {
     id: "btn12",
     name: "１２．たんけいごの②。 最初の三マスを残して、後ろを省略するもの",
     items: [
+      { word:"across",     dots:[[1],[1,4],[1,2,3,5]] },
+      { word:"almost",     dots:[[1],[1,2,3],[1,3,4]] },
+      { word:"already",    dots:[[1],[1,2,3],[1,2,3,5]] },
+      { word:"always",     dots:[[1],[1,2,3],[2,4,5,6]] },
+      { word:"altogether", dots:[[1],[1,2,3],[2,3,4,5]] },
+      { word:"although",   dots:[[1],[1,2,3],[1,4,5,6]] },
+      { word:"immediate",  dots:[[2,4],[1,3,4],[1,3,4]] },
+      { word:"necessary",  dots:[[1,3,4,5],[1,5],[1,4]] },
+      { word:"neither",    dots:[[1,3,4,5],[1,5],[2,4]] },
+      { word:"perhaps",    dots:[[1,2,3,4],[1,2,4,5,6],[1,2,5]] }
+
+    /* =========================================================
       { word:"across",     ja:"アクロス",     dots:[[1],[1,4],[1,2,3,5]] },
       { word:"almost",     ja:"オールモスト", dots:[[1],[1,2,3],[1,3,4]] },
       { word:"already",    ja:"オールレディ", dots:[[1],[1,2,3],[1,2,3,5]] },
@@ -339,12 +465,25 @@ const QUIZ_SETS = [
       { word:"necessary",  ja:"ネセサリー",   dots:[[1,3,4,5],[1,5],[1,4]] },
       { word:"neither",    ja:"ナイザー",     dots:[[1,3,4,5],[1,5],[2,4]] },
       { word:"perhaps",    ja:"パーハップス",     dots:[[1,2,3,4],[1,2,4,5,6],[1,2,5]] }
+    ========================================================= */
     ]
   },
   {
     id: "btn13",
     name: "１３．たんけいごの③。 self、selves が付く語の一部を省略するもの",
     items: [
+      { word:"myself",     dots:[[1,3,4],[1,3,4,5,6],[1,2,4]] },
+      { word:"yourself",   dots:[[1,3,4,5,6],[1,2,3,5],[1,2,4]] },
+      { word:"himself",    dots:[[1,2,5],[1,3,4],[1,2,4]] },
+      { word:"herself",    dots:[[1,2,5],[1,2,4,5,6],[1,2,4]] },
+      { word:"itself",     dots:[[1,3,4,6],[1,2,4]] },
+      { word:"oneself",    dots:[[5],[1,3,5],[1,2,4]] },
+      { word:"thyself",    dots:[[1,4,5,6],[1,3,4,5,6],[1,2,4]] },
+      { word:"ourselves",  dots:[[1,2,5,6],[1,2,3,5],[1,2,3,6],[2,3,4]] },
+      { word:"yourselves", dots:[[1,3,4,5,6],[1,2,3,5],[1,2,3,6],[2,3,4]] },
+      { word:"themselves", dots:[[2,3,4,6],[1,3,4],[1,2,3,6],[2,3,4]] }
+
+    /* =========================================================
       { word:"myself",     ja:"マイセルフ",     dots:[[1,3,4],[1,3,4,5,6],[1,2,4]] },
       { word:"yourself",   ja:"ユアセルフ",     dots:[[1,3,4,5,6],[1,2,3,5],[1,2,4]] },
       { word:"himself",    ja:"ヒムセルフ",     dots:[[1,2,5],[1,3,4],[1,2,4]] },
@@ -355,6 +494,7 @@ const QUIZ_SETS = [
       { word:"ourselves",  ja:"アワセルヴズ",   dots:[[1,2,5,6],[1,2,3,5],[1,2,3,6],[2,3,4]] },
       { word:"yourselves", ja:"ユアセルヴズ",   dots:[[1,3,4,5,6],[1,2,3,5],[1,2,3,6],[2,3,4]] },
       { word:"themselves", ja:"ゼムセルヴズ",   dots:[[2,3,4,6],[1,3,4],[1,2,3,6],[2,3,4]] }
+    ========================================================= */
     ]
   },
   {
@@ -397,29 +537,40 @@ function getJapaneseVoice() {
   return voices.find(v => (v.lang || "").toLowerCase().startsWith("ja")) || null;
 }
 
+function getEnglishVoice() {
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  return voices.find(v => (v.lang || "").toLowerCase().startsWith("en")) || null;
+}
+
 /**
  * テキスト読み上げ（Promise化）
  * - iOS Safari/Chrome 共通で speechSynthesis を使用
  * - 連続読み上げ用に await で待てるようにしています
  */
-function speak(text) {
+function speak(text, opts = {}) {
   return new Promise((resolve) => {
     if (!("speechSynthesis" in window)) {
-      // Web Speech API が無い場合は何もしない（要件上は基本OKの想定）
       resolve();
       return;
     }
 
-    // 前の発話が残っている場合は停止（ボタン切替のときなど）
+    // 前の発話が残っている場合は停止
     window.speechSynthesis.cancel();
 
     const uttr = new SpeechSynthesisUtterance(text);
-    uttr.lang = SPEECH.lang;
-    uttr.rate = SPEECH.rate;
-    uttr.pitch = SPEECH.pitch;
-    uttr.volume = SPEECH.volume;
 
-    const voice = getJapaneseVoice();
+    // ★言語を選べるように（デフォルトは日本語）
+    const lang = opts.lang || SPEECH.ja.lang;
+    uttr.lang = lang;
+
+    // ★速度なども言語ごとに切替
+    const conf = (lang.toLowerCase().startsWith("en")) ? SPEECH.en : SPEECH.ja;
+    uttr.rate = conf.rate;
+    uttr.pitch = conf.pitch;
+    uttr.volume = conf.volume;
+
+    // ★voice も言語で切替
+    const voice = (lang.toLowerCase().startsWith("en")) ? getEnglishVoice() : getJapaneseVoice();
     if (voice) uttr.voice = voice;
 
     uttr.onend = () => resolve();
@@ -440,15 +591,9 @@ function sleep(ms) {
  * - 無ければアルファベットを1文字ずつ日本語読み（エー、ビー…）にする
  */
 function toJapaneseReading(item) {
-  if (item.ja && item.ja.trim()) return item.ja.trim();
-
-  // フォールバック：アルファベットを一文字ずつ日本語読み
-  const w = String(item.word || "");
-  const chars = w.toLowerCase().split("");
-  const parts = chars.map(ch => PRONOUNCE.letterMap[ch] || ch);
-  return parts.join(" ");
+  const ja = (item?.ja || "").trim();
+  return ja || null; // ★無ければ null
 }
-
 /**
  * dots を「ひとますめが 1,2,3 の点…」形式に変換
  * - dots は [[...],[...],...] の配列（マスごと）
@@ -615,10 +760,23 @@ async function runQuiz(set, token) {
     await sleep(DELAY.beforeAnswerMs);
     if (token !== currentRunToken) return;
 
-    // 答え（日本語読み）
-    const answerReading = toJapaneseReading(q);
-    // ここでは「答えは "day" です」の day 部分を日本語読み（例：デイ）にしています
-    await speak(`答えは、${answerReading} 、です`);
+
+    const ja = toJapaneseReading(q);
+    if (ja) {
+      // 日本語読みが用意されているものは、日本語で自然に
+      await speak(`答えは、${ja}、です`, { lang: "ja-JP" });
+    } else {
+      // ★ja が無い場合：
+    // 1)「答えは、」日本語
+      await speak("答えは、", { lang: "ja-JP" });
+
+      // 2) 単語だけ英語（自然な英語読み）
+      await speak(String(q.word || ""), { lang: "en-US" });
+
+      // 3)「です」日本語
+      await speak("、です。", { lang: "ja-JP" });
+    }
+
     if (token !== currentRunToken) return;
 
     // 1秒待機
